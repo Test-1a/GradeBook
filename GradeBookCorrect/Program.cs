@@ -9,9 +9,24 @@ namespace GradeBook
         {
             //Test change
             var book = new Book("Scott´s Grade Book");
-            book.AddGrade(89.1);
-            book.AddGrade(90.5);
-            book.AddGrade(77.5);
+            //book.AddGrade(89.1);
+            //book.AddGrade(90.5);
+            //book.AddGrade(77.5);
+
+            while (true)
+            {
+                Console.WriteLine("Enter a grade or 'q' to quit");
+                var input = Console.ReadLine();
+
+                if (input == "q")
+                {
+                    break;
+                }
+
+                var grade = double.Parse(input);
+                book.AddGrade(grade);
+            }
+
  
             var stats = book.GetStatistics();
 
