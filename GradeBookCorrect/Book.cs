@@ -127,7 +127,28 @@ namespace GradeBook
         }
 
         private List<double> grades;    // This is a Field
-        public string Name;
+
+ /*       //public string Name;
+        private string name;    //make it private to control access to this state
+        public string Name  //Not a method, it does not have parenthesis
+        {
+            get
+            {
+                return name;
+            }
+            set
+            {
+                name = value;
+            }
+        }       */
+
+        public string Name
+        {
+            get; private set;
+        }
+
+        //readonly string category;
+        public const string CATEGORY = "Science";
     }
 }
 
