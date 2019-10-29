@@ -16,16 +16,16 @@ namespace GradeBook.Tests
             book.AddGrade(85);
             book.AddGrade(95);
             book.AddGrade(75);
-            book.AddLetterGrade('B');
+           // book.AddLetterGrade('B');
 
             //act
             var result = book.GetStatistics();
 
             //assert
-            Assert.Equal(85.6, result.Average, 1);  //3rd parameter means "1 decimal"
-            Assert.Equal(90.5, result.High, 1);     //3rd parameter means "1 decimal"
-            Assert.Equal(77.3, result.Low, 1);      //3rd parameter means "1 decimal"
-            Assert.Equal('B', result.Letter);
+            Assert.Equal(85, result.Average, 1);  //3rd parameter means "1 decimal"
+            Assert.Equal(95, result.High, 1);     //3rd parameter means "1 decimal"
+            Assert.Equal(75, result.Low, 1);      //3rd parameter means "1 decimal"
+           // Assert.Equal('B', result.Letter);
         }
     }
 }

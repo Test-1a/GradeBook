@@ -4,6 +4,8 @@ using System.Text;
 
 namespace GradeBook
 {
+    public delegate void GradeAddedDelegate(object sender, EventArgs args);
+
     public class Book
     {
         public Book(string name)
@@ -38,11 +40,18 @@ namespace GradeBook
             }
         }
 
+        public event GradeAddedDelegate GradeAdded;
+
         public void AddGrade(double grade)
         {
             if (grade <= 100 && grade >= 0)   // grade is 0 - 100
             {
                 grades.Add(grade);  // Storing the grade
+
+                if(GradeAdded != null)
+                {
+                    GradeAdded(this, new EventArgs());  //raising an Event when a
+                }                                       //grade has been added
             }
             else
             {
@@ -144,7 +153,7 @@ namespace GradeBook
 
         public string Name
         {
-            get; private set;
+            get; set;
         }
 
         //readonly string category;

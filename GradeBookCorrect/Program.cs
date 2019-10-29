@@ -7,11 +7,11 @@ namespace GradeBook
     {
         static void Main(string[] args)
         {
-            //Test change
             var book = new Book("Scott´s Grade Book");
-            //book.AddGrade(89.1);
-            //book.AddGrade(90.5);
-            //book.AddGrade(77.5);
+            book.GradeAdded += OnGradeAdded;
+            book.GradeAdded += OnGradeAdded;
+            book.GradeAdded -= OnGradeAdded;
+            book.GradeAdded += OnGradeAdded;
 
             while (true)
             {
@@ -37,6 +37,11 @@ namespace GradeBook
             Console.WriteLine($"The average grade is {stats.Average:N1}"); // Formatted as a Number with 1 decimal
             Console.WriteLine($"The letter grade is {stats.Letter}");
             Console.WriteLine(Book.CATEGORY);
+        }
+
+        static void OnGradeAdded(object sender, EventArgs e)   //method to be invoked by Event
+        {
+            Console.WriteLine("A grade was added");
         }
     }
 }

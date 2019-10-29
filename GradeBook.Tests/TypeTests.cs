@@ -5,10 +5,45 @@ using Xunit;
 
 namespace GradeBook.Tests
 {
+    public delegate string WriteLogDelegate(string logMessage);
+
     public class TypeTests
     {
+        int count = 0;
+
         [Fact]
-        public void Test1Ref()
+        public void WriteLogDelegateCanPointToMultipleMethods()
+        {
+            WriteLogDelegate log = ReturnMessage;    //couple to RM once
+            log += ReturnMessage;               //couple to RM once more
+            log += IncrementCount;              //couple to IC once
+            var result = log("Hello!");     //invoke RM twice and IC once
+            Assert.Equal(3, count);
+        }
+
+        string IncrementCount(string message)
+        {
+            count++;
+            return message;
+        }
+
+        [Fact]
+        public void WriteLogDelegateCanPointToMethod()
+        {
+            WriteLogDelegate log;   //variable of type WriteLogDelegate
+            log = ReturnMessage;    //the same as "log = new WriteLogDelegate(ReturnMessage);"
+            var result = log("Hello!");
+            Assert.Equal("Hello!", result);
+        }
+
+        string ReturnMessage(string message)
+        {
+            count++;
+            return message;
+        }
+
+        [Fact]
+        public void ValueTypesAlsoPassByValue()
         {
             var x = GetInt();
             SetInt(ref x);
