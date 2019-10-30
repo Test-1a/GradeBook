@@ -1,20 +1,98 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Generic;   //List
 using System.Text;
+using System.IO;    //File
 
 namespace GradeBook
 {
     public delegate void GradeAddedDelegate(object sender, EventArgs args);
 
-    public class Book
+    public class NamedObject
     {
-        public Book(string name)
+        public NamedObject(string name)
         {
-            grades = new List<double>();
             Name = name;
         }
 
-        public void AddLetterGrade(char letter)
+        public string Name
+        {
+            get;
+            set;
+        }
+    }
+
+    public interface IBook  //interface class
+    {
+        void AddGrade(double grade);
+        Statistics GetStatistics();
+        string Name { get; }
+        event GradeAddedDelegate GradeAdded;
+    }
+
+    public abstract class Book : NamedObject, IBook  //abstract class //General class
+    {
+        public Book(string name) : base(name)
+        {
+        }
+
+        public abstract event GradeAddedDelegate GradeAdded; 
+        public abstract void AddGrade(double grade);     //abstract method => also virtual
+        public abstract Statistics GetStatistics();
+    }
+
+    public class DiskBook : Book   //don't have to inherit from Base class, it is OK
+    {                               //to only inherit from the Interface (IBook)
+        public DiskBook(string name) : base(name)
+        {
+        }
+
+        public override event GradeAddedDelegate GradeAdded;
+
+        public override void AddGrade(double grade)
+        {
+            using (StreamWriter writer = File.AppendText($"{Name}.txt"))    //impl IDisposible
+            {                                   //used with Files or Sockets
+                writer.WriteLine(grade);
+
+                if(GradeAdded != null)
+                {
+                    GradeAdded(this, new EventArgs());
+                }
+            }   //here the fileHandle(SW) is released IMMEDIATELY by the GC
+        }
+
+        public override Statistics GetStatistics()
+        {
+            var result = new Statistics();
+
+            using (StreamReader reader = File.OpenText($"{Name}.txt"))
+            {
+                string line = reader.ReadLine();
+
+                while (line != null)
+                {
+                    double number = double.Parse(line);
+                    result.Add(number);
+                    line = reader.ReadLine();
+                }
+            }
+
+                return result;
+        }
+    }
+
+    public class InMemoryBook : Book
+    //public class InMemoryBook : Book, IBook //can inherit both classes and interfaces(0 or more)
+    //public class Book
+    {
+        public InMemoryBook(string name) : base(name)   //When I'm creating a InMemoryBook I'm also creating a Book
+        {                                               //so I must run the constructor of the Book too
+            grades = new List<double>();
+           // Name = name;
+        }
+
+        //public void AddLetterGrade(char letter)
+        public void AddGrade(char letter)
         {
             switch (letter)
             {
@@ -40,9 +118,9 @@ namespace GradeBook
             }
         }
 
-        public event GradeAddedDelegate GradeAdded;
+        public override event GradeAddedDelegate GradeAdded;    //override the event in Base class
 
-        public void AddGrade(double grade)
+        public override void AddGrade(double grade) //to override the AddGrade method in BookBase
         {
             if (grade <= 100 && grade >= 0)   // grade is 0 - 100
             {
@@ -63,81 +141,21 @@ namespace GradeBook
             
         }
 
-        public Statistics GetStatistics()
+        public override Statistics GetStatistics()  //override method in Base class
         {
-            //var result = 0.0;
             var result = new Statistics();
-            result.Average = 0.0;
-            result.High = double.MinValue;
-            result.Low = double.MaxValue;
 
-
-            foreach (var grade in grades)
+            for (var index = 0; index < grades.Count; index += 1)
             {
-                result.Low = Math.Min(grade, result.Low);
-                result.High = Math.Max(grade, result.High);
-                result.Average += grade;
-            }
-            result.Average /= grades.Count;
-
-            //var index = 0;
-            //do
-            //{
-            //    result.Low = Math.Min(grades[index], result.Low);
-            //    result.High = Math.Max(grades[index], result.High);
-            //    result.Average += grades[index];
-            //    index += 1;
-            //} while (index < grades.Count);
-            //result.Average /= grades.Count;
-
-            //var index = 0;
-            //while (index < grades.Count);
-            //{
-            //    result.Low = Math.Min(grades[index], result.Low);
-            //    result.High = Math.Max(grades[index], result.High);
-            //    result.Average += grades[index];
-            //    index += 1;
-            //};
-            //result.Average /= grades.Count;
-
-            //for(var index = 0; index < grades.Count; index += 1)
-            //{
-            //    result.Low = Math.Min(grades[index], result.Low);
-            //    result.High = Math.Max(grades[index], result.High);
-            //    result.Average += grades[index];
-            //    index += 1;
-            //}
-            //result.Average /= grades.Count;
-
-            switch (result.Average)
-            {
-                case var d when d >= 90.0:  // C# ver 7
-                    result.Letter = 'A';
-                    break;
-
-                case var d when d >= 80.0:
-                    result.Letter = 'B';
-                    break;
-
-                case var d when d >= 70.0:
-                    result.Letter = 'C';
-                    break;
-
-                case var d when d >= 60.0:
-                    result.Letter = 'D';
-                    break;
-
-                default:
-                    result.Letter = 'F';
-                    break;
-            }
+                result.Add(grades[index]);
+             }
 
             return result;
         }
 
         private List<double> grades;    // This is a Field
 
- /*       //public string Name;
+ /*     //public string Name;
         private string name;    //make it private to control access to this state
         public string Name  //Not a method, it does not have parenthesis
         {
@@ -151,10 +169,11 @@ namespace GradeBook
             }
         }       */
 
-        public string Name
-        {
-            get; set;
-        }
+        //Commented out due to will be inheriting it from NamedObject
+        //public string Name
+        //{
+        //    get; set;
+        //}
 
         //readonly string category;
         public const string CATEGORY = "Science";
