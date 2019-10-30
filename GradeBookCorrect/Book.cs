@@ -4,6 +4,8 @@ using System.Text;
 
 namespace GradeBook
 {
+    //This is a new special comment
+
     public delegate void GradeAddedDelegate(object sender, EventArgs args);
 
     public class Book
